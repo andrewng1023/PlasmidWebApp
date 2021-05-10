@@ -20,8 +20,7 @@ class Project(models.Model):
     initials = models.CharField(max_length=10, unique=True)
     description = models.TextField()
     members = models.ManyToManyField(User)
-
-
+    
 class Feature(models.Model):
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     sequence = models.TextField()
@@ -97,8 +96,7 @@ class Plasmid(models.Model):
         unique_together = ('project', 'projectindex',)
 
     def get_standard_id(self):
-        return f'{self.get_aliases_as_string()}'
-        #return f'p{self.project.project.capitalize()}_{self.projectindex:0>5}'
+        return f'p{self.project.project.capitalize()}_{self.projectindex:0>5}'
 
     def get_aliases_as_string(self):
         return ', '.join(sorted([altname.alias for altname in self.aliases.all()]))
@@ -169,3 +167,20 @@ class PlasmidFile(models.Model):
     description = models.TextField()
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
+
+
+# --- Plasmid Part Assembly Views --- #
+
+class PlasmidPartPrimer(models.Model):
+    sequence = models.TextField()
+
+
+class PlasmidPartFragment(models.Model):
+    plasmid = models.ForeignKey(Plasmid, on_delete=models.CASCADE)
+    sequence = models.TextField()
+    method = models.TextField()
+    primers = models.ManyToManyField(PlasmidPartPrimer)
+    template = models.TextField()
+
+
+
