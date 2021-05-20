@@ -20,7 +20,7 @@ class Project(models.Model):
     initials = models.CharField(max_length=10, unique=True)
     description = models.TextField()
     members = models.ManyToManyField(User)
-    
+
 class Feature(models.Model):
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     sequence = models.TextField()
@@ -80,6 +80,7 @@ class Plasmid(models.Model):
     projectindex = models.IntegerField()
     sequence = models.TextField()
     description = models.TextField()
+    benchlingID = models.TextField(unique=True)
     created = models.DateTimeField(auto_now_add=True)
     feature = models.ManyToManyField(Feature)
     attribute = models.ManyToManyField(Attribute)
@@ -174,13 +175,14 @@ class PlasmidFile(models.Model):
 class PlasmidPartPrimer(models.Model):
     sequence = models.TextField()
 
+    def get_name(self):
+        return f'o{self.pk:0>5}'
+
 
 class PlasmidPartFragment(models.Model):
-    plasmid = models.ForeignKey(Plasmid, on_delete=models.CASCADE)
+    plasmid = models.ForeignKey(Plasmid, on_delete=models.CASCADE, related_name='fragments')
+    index = models.IntegerField()
     sequence = models.TextField()
     method = models.TextField()
     primers = models.ManyToManyField(PlasmidPartPrimer)
     template = models.TextField()
-
-
-
