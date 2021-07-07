@@ -339,10 +339,10 @@ def download_assembly_instructions(request):
                 # Add line for part entry vector
                 constituent_plasmids = current_plasmid.plasmidproduct.all()
                 for constituent in constituent_plasmids:
-                    plasmid_plan_list.append((constituent.get_aliases_as_string(), '500'))
+                    plasmid_plan_list.append((constituent.input.get_aliases_as_string(), '500'))
                     new_fragment_line = {'Index': index if first_line else '',
                                          'Assembly ID': current_plasmid.get_aliases_as_string() if first_line else '',
-                                         'Part Name': constituent.get_aliases_as_string(),
+                                         'Part Name': constituent.input.get_aliases_as_string(),
                                          }
                     part_instructions_list.append(new_fragment_line)
 
