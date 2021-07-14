@@ -354,10 +354,19 @@ def download_assembly_instructions(request):
                 if len(constituent_plasmids) > 0:
                     for constituent in constituent_plasmids:
                         plasmid_plan_list.append((f'{constituent.input.get_aliases_as_string()}', plasmidVolume))
+                        benchlingID = constituent.input.benchlingID
+                        batches = getBenchling('custom-entities?sort=modifiedAt%3Adesc&schemaId=ts_DqG0sawS&schemaField.Parent%20Plasmid=',benchlingID)
+
+                        if batches['customEntities']:
+                            PlasmidLocation = batches['customEntities'][0]['fields']['MoClo Plate Location (S#_Plate#_Well)']['displayValue']
+                        else:
+                            PlasmidLocation = 'No Batch Registered'
+
                         new_constituent_line = {'Index': index if first_line else '',
                                                 'Assembly ID': current_plasmid.get_aliases_as_string() if first_line else '',
                                                 'Part Name': current_plasmid.description if first_line else '',
                                                 'Insert': constituent.input.get_aliases_as_string(),
+                                                'Location': PlasmidLocation,
                                                 'Special Instructions': current_plasmid.description if first_line else '',
                                                 }
                         cassette_instructions_list.append(new_constituent_line)
@@ -520,7 +529,7 @@ def download_assembly_instructions(request):
 
         # Get unique assembly plasmids
         unique_assembly_df = cassette_assembly_df.drop_duplicates('Insert', keep='first')
-        unique_template_df = unique_assembly_df[['Insert']]
+        unique_template_df = unique_assembly_df[['Insert','Location']]
         assembly_io = io.StringIO()
         unique_template_df.to_csv(assembly_io, index=False)
         assembly_io.seek(0)
